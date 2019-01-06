@@ -118,9 +118,9 @@
 
 	Thanks
 	~~~~~~
-	I'd like to extend thanks to Eremiell, slavka, gurkanctn, Phantim, 
+	I'd like to extend thanks to Eremiell, slavka, gurkanctn, Phantim,
 	JackOJC, KrossX, Huhlig, Dragoneye, Appa, JustinRichardsMusic, SliceNDice
-	Ralakus, Gorbit99, raoul & MagetzUb for advice, ideas and testing, and I'd like 
+	Ralakus, Gorbit99, raoul & MagetzUb for advice, ideas and testing, and I'd like
 	to extend my appreciation to the 23K YouTube followers and 1.5K Discord server
 	members who give me the motivation to keep going with all this :D
 
@@ -132,11 +132,11 @@
 	certainly enjoyed my tea and flapjacks :D
 
 	Author
-	~~~~~~ 
+	~~~~~~
 	David Barr, aka javidx9, ©OneLoneCoder 2018, 2019
 */
 
-////////////////////////////////////////////////////////////////////////////////////////// 
+//////////////////////////////////////////////////////////////////////////////////////////
 
 /* Example Usage (main.cpp)
 	#define OLC_PGE_APPLICATION
@@ -328,7 +328,7 @@ namespace olc // All OneLoneCoder stuff will now exist in the "olc" namespace
 		void  SetPixel(int32_t x, int32_t y, Pixel p);
 		Pixel Sample(float x, float y);
 		Pixel* GetData();
-	
+
 	private:
 		Pixel *pColData = nullptr;
 		Mode modeSample = Mode::NORMAL;
@@ -808,7 +808,7 @@ namespace olc
                 return Pixel(0, 0, 0, 0);
         }
         else
-        {			
+        {
             return pColData[abs(y%height)*width + abs(x%width)];
         }
     }
@@ -1297,7 +1297,7 @@ namespace olc
     }
 
     void PixelGameEngine::FillRect(int32_t x, int32_t y, int32_t w, int32_t h, Pixel p)
-    {			
+    {
         int32_t x2 = x + w;
         int32_t y2 = y + h;
 
@@ -1534,9 +1534,9 @@ namespace olc
                 {
                     for (uint32_t i = 0; i < 8; i++)
                         for (uint32_t j = 0; j < 8; j++)
-                            if (fontSprite->GetPixel(i + ox * 8, j + oy * 8).r > 0)								
+                            if (fontSprite->GetPixel(i + ox * 8, j + oy * 8).r > 0)
                                 Draw(x + sx + i, y + sy + j, col);
-                }										
+                }
                 sx += 8 * scale;
             }
         }
@@ -1764,14 +1764,14 @@ namespace olc
                 {
                     fFrameTimer -= 1.0f;
 
-                    std::string sTitle = "OneLoneCoder.com - Pixel Game Engine - " + sAppName + " - FPS: " + std::to_string(nFrameCount);
+                    std::string sTitle = "PGE - " + sAppName + " - FPS: " + std::to_string(nFrameCount);
 #ifdef _WIN32
 #ifdef UNICODE
                     SetWindowText(olc_hWnd, ConvertS2W(sTitle).c_str());
 #else
                     SetWindowText(olc_hWnd, sTitle.c_str());
 #endif
-#else					
+#else
                     XStoreName(olc_Display, olc_Window, sTitle.c_str());
 #endif
                     nFrameCount = 0;
@@ -1945,13 +1945,13 @@ namespace olc
         switch (uMsg)
         {
         case WM_CREATE:		sge = (PixelGameEngine*)((LPCREATESTRUCT)lParam)->lpCreateParams;	return 0;
-        case WM_MOUSEMOVE:	
+        case WM_MOUSEMOVE:
         {
             uint16_t x = lParam & 0xFFFF;				// Thanks @ForAbby (Discord)
             uint16_t y = (lParam >> 16) & 0xFFFF;
             int16_t ix = *(int16_t*)&x;
             int16_t iy = *(int16_t*)&y;
-            sge->olc_UpdateMouse(ix, iy);	
+            sge->olc_UpdateMouse(ix, iy);
             return 0;
         }
         case WM_MOUSELEAVE: sge->bHasMouseFocus = false;
@@ -1996,7 +1996,7 @@ namespace olc
         XSetWMProtocols(olc_Display, olc_Window, &wmDelete, 1);
 
         XMapWindow(olc_Display, olc_Window);
-        XStoreName(olc_Display, olc_Window, "OneLoneCoder.com - Pixel Game Engine");
+        XStoreName(olc_Display, olc_Window, "PGE");
 
         // Create Keyboard Mapping
         mapKeys[0x61] = Key::A; mapKeys[0x62] = Key::B; mapKeys[0x63] = Key::C; mapKeys[0x64] = Key::D; mapKeys[0x65] = Key::E;
@@ -2035,7 +2035,7 @@ namespace olc
         glXMakeCurrent(olc_Display, olc_Window, glDeviceContext);
 
         XWindowAttributes gwa;
-        XGetWindowAttributes(olc_Display, olc_Window, &gwa);		
+        XGetWindowAttributes(olc_Display, olc_Window, &gwa);
         glViewport(0, 0, gwa.width, gwa.height);
 
         glSwapIntervalEXT = nullptr;

@@ -24,12 +24,14 @@ private:
 	bool _uncovered;
 	bool _flagged;
 	DisplayNum _numToDisplay;
+    bool _showMine;
 
 public:
 
-	const static unsigned int WIDTH = 16*2;
-	const static unsigned int HEIGHT = 16*2;
-	const static unsigned int BORDER = 4*2;
+	const static unsigned int SCALE = 1;
+    const static unsigned int WIDTH = 16 * SCALE;
+    const static unsigned int HEIGHT = 16 * SCALE;
+	const static unsigned int BORDER = 4 * SCALE;
 
 	Tile() = delete;
 	Tile(unsigned int x, unsigned int y);
@@ -44,6 +46,11 @@ public:
 
 	void setNum(DisplayNum d);
     void setNum(int i);
+
+    void placeMine();
+    void doShowMine();
+
+    bool isMine();
 
 };
 
