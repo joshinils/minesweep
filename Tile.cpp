@@ -1,7 +1,9 @@
-#include "Tile.h"
 #include "Minesweep.h"
 
-Tile::Tile(size_t x, size_t y)
+#include "Tile.h"
+
+
+Tile::Tile(unsigned int x, unsigned int y)
 	: _x(x)
 	, _y(y)
 	, _isMine(false)

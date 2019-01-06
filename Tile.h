@@ -1,7 +1,6 @@
 #ifndef TILE_H
 #define TILE_H
 
-
 class Tile
 {
 public:
@@ -20,7 +19,7 @@ public:
 	};
 
 private:
-	size_t _x, _y;
+	unsigned int _x, _y;
 	bool _isMine;
 	bool _uncovered;
 	bool _flagged;
@@ -28,12 +27,12 @@ private:
 
 public:
 
-	static const size_t WIDTH = 16*2;
-	static const size_t HEIGHT = 16*2;
-	static const size_t BORDER = 4*2;
+	const static unsigned int WIDTH = 16*2;
+	const static unsigned int HEIGHT = 16*2;
+	const static unsigned int BORDER = 4*2;
 
 	Tile() = delete;
-	Tile(size_t x, size_t y);
+	Tile(unsigned int x, unsigned int y);
 	~Tile() = default;
 
 	void draw();

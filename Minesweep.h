@@ -2,6 +2,7 @@
 #define MINESWEEP_H
 
 #include "olcPixelGameEngine.h"
+
 #include "Tile.h"
 #include <array>
 
@@ -15,9 +16,9 @@ public:
 	{
 		sAppName = "Minesweep";
         int color = Tile::DisplayNum::Nothing;
-		for (size_t i = 0; i < nTx; i++)
+		for (unsigned int i = 0; i < nTx; i++)
 		{
-			for (size_t j = 0; j < nTy; j++)
+			for (unsigned int j = 0; j < nTy; j++)
 			{
 				_playField.at(i).at(j) = Tile(i*Tile::WIDTH + Tile::BORDER, j*Tile::HEIGHT + Tile::BORDER);
 				_playField.at(i).at(j).setNum(color++);
