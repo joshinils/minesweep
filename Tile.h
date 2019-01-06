@@ -15,7 +15,7 @@ public:
 		Five = 5,
 		Six = 6,
 		Seven = 7,
-		eight = 8,
+		Eight = 8,
 		Nine = 9,
 	};
 
@@ -44,6 +44,8 @@ public:
 	void toggleFlagged();
 
 	void setNum(DisplayNum d);
+    void setNum(int i);
+
 };
 
 #endif // TILE_H
