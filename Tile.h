@@ -22,9 +22,11 @@ private:
 	unsigned int _x, _y;
 	bool _isMine;
 	bool _uncovered;
-	bool _flagged;
+	bool _isFlagged;
 	DisplayNum _numToDisplay;
     bool _showMine;
+    bool _isHeldDown = false;
+    bool _isKilled = false;
 
 public:
 
@@ -38,20 +40,29 @@ public:
 	~Tile() = default;
 
 	void draw();
-	void uncover();
+
+    void uncover();
 	void cover();
+    bool isCovered();
+
 	void flag();
 	void unflag();
 	void toggleFlagged();
+    bool isFlagged();
 
 	void setNum(DisplayNum d);
     void setNum(int i);
+    DisplayNum getNum();
 
     void placeMine();
     void doShowMine();
 
     bool isMine();
 
+    void holdDown();
+    bool isHeld();
+
+    void kill();
 };
 
 #endif // TILE_H

@@ -5,9 +5,9 @@
 
 int main()
 {
-    std::srand(12);
-    uint32_t nTilesX = 10;
-    uint32_t nTilesY = 10;
+    std::srand(42);
+    uint32_t nTilesX = 30;
+    uint32_t nTilesY = 30;
 
     uint32_t displaySizeX = nTilesX * Tile::WIDTH  + Tile::BORDER*2 +1; // +1 for linewidth of tile itself
     uint32_t displaySizeY = nTilesY * Tile::HEIGHT + Tile::BORDER*2 +1;
