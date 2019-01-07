@@ -318,14 +318,14 @@ namespace olc // All OneLoneCoder stuff will now exist in the "olc" namespace
 		olc::rcode SaveToPGESprFile(std::string sImageFile);
 
 	public:
-		int32_t width = 0;
-		int32_t height = 0;
+		uint32_t width = 0;
+		uint32_t height = 0;
 		enum Mode { NORMAL, PERIODIC };
 
 	public:
 		void SetSampleMode(olc::Sprite::Mode mode = olc::Sprite::Mode::NORMAL);
-		Pixel GetPixel(int32_t x, int32_t y);
-		void  SetPixel(int32_t x, int32_t y, Pixel p);
+		inline Pixel GetPixel(uint32_t const& x, uint32_t const& y);
+		inline void  SetPixel(uint32_t const& x, uint32_t const& y, Pixel const& p);
 		Pixel Sample(float x, float y);
 		Pixel* GetData();
 
@@ -388,9 +388,9 @@ namespace olc // All OneLoneCoder stuff will now exist in the "olc" namespace
 
 	public: // Utility
 		// Returns the width of the screen in "pixels"
-		int32_t ScreenWidth();
+		uint32_t ScreenWidth();
 		// Returns the height of the screen in "pixels"
-		int32_t ScreenHeight();
+		uint32_t ScreenHeight();
 		// Returns the width of the currently selected drawing target in "pixels"
 		int32_t GetDrawTargetWidth();
 		// Returns the height of the currently selected drawing target in "pixels"
@@ -416,7 +416,7 @@ namespace olc // All OneLoneCoder stuff will now exist in the "olc" namespace
 		void SetSubPixelOffset(float ox, float oy);
 
 		// Draws a single Pixel
-		virtual void Draw(int32_t x, int32_t y, Pixel p = olc::WHITE);
+		virtual void Draw(uint32_t const& x, uint32_t const& y, Pixel const& p = olc::WHITE);
 		// Draws a line from (x1,y1) to (x2,y2)
 		void DrawLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Pixel p = olc::WHITE);
 		// Draws a circle located at (x,y) with radius
@@ -449,10 +449,10 @@ namespace olc // All OneLoneCoder stuff will now exist in the "olc" namespace
 		Sprite		*pDrawTarget = nullptr;
 		Pixel::Mode	nPixelMode = Pixel::NORMAL;
 		float		fBlendFactor = 1.0f;
-		uint32_t	nScreenWidth = 256;
-		uint32_t	nScreenHeight = 240;
-		uint32_t	nPixelWidth = 4;
-		uint32_t	nPixelHeight = 4;
+		uint32_t nScreenWidth = 256;
+		uint32_t nScreenHeight = 240;
+		uint32_t nPixelWidth = 4;
+		uint32_t nPixelHeight = 4;
 		int32_t	nMousePosX = 0;
 		int32_t	nMousePosY = 0;
 		float		fPixelX = 1.0f;
@@ -617,7 +617,7 @@ namespace olc
         if(pColData) delete[] pColData;
         width = w;		height = h;
         pColData = new Pixel[width * height];
-        for (int32_t i = 0; i < width*height; i++)
+        for (uint32_t i = 0; i < width*height; i++)
             pColData[i] = Pixel();
     }
 
@@ -703,8 +703,8 @@ namespace olc
         height = bmp->GetHeight();
         pColData = new Pixel[width * height];
 
-        for(int x=0; x<width; x++)
-            for (int y = 0; y < height; y++)
+        for(unsigned int x=0; x<width; x++)
+            for (unsigned int y = 0; y < height; y++)
             {
                 Gdiplus::Color c;
                 bmp->GetPixel(x, y, &c);
@@ -798,29 +798,29 @@ namespace olc
     }
 
 
-    Pixel Sprite::GetPixel(int32_t x, int32_t y)
+    Pixel Sprite::GetPixel(uint32_t const& x, uint32_t const& y)
     {
         if (modeSample == olc::Sprite::Mode::NORMAL)
         {
-            if (x >= 0 && x < width && y >= 0 && y < height)
+            if (x < width && y < height)
                 return pColData[y*width + x];
             else
                 return Pixel(0, 0, 0, 0);
         }
         else
         {
-            return pColData[abs(y%height)*width + abs(x%width)];
+            return pColData[(y%height) *width + x%width];
         }
     }
 
-    void Sprite::SetPixel(int32_t x, int32_t y, Pixel p)
+    void Sprite::SetPixel(uint32_t const& x, uint32_t const& y, Pixel const& p)
     {
 
 #ifdef OLC_DBG_OVERDRAW
         nOverdrawCount++;
 #endif
 
-        if (x >= 0 && x < width && y >= 0 && y < height)
+        if (x < width && y < height)
             pColData[y*width + x] = p;
     }
 
@@ -1097,17 +1097,17 @@ namespace olc
         return nMousePosY;
     }
 
-    int32_t PixelGameEngine::ScreenWidth()
+    uint32_t PixelGameEngine::ScreenWidth()
     {
         return nScreenWidth;
     }
 
-    int32_t PixelGameEngine::ScreenHeight()
+    uint32_t PixelGameEngine::ScreenHeight()
     {
         return nScreenHeight;
     }
 
-    void PixelGameEngine::Draw(int32_t x, int32_t y, Pixel p)
+    void PixelGameEngine::Draw(uint32_t const& x, uint32_t const& y, Pixel const& p)
     {
         if (!pDrawTarget) return;
 
@@ -1298,8 +1298,8 @@ namespace olc
 
     void PixelGameEngine::FillRect(int32_t x, int32_t y, int32_t w, int32_t h, Pixel p)
     {
-        int32_t x2 = x + w;
-        int32_t y2 = y + h;
+        uint32_t x2 = x + w;
+        uint32_t y2 = y + h;
 
         if (x < 0) x = 0;
         if (x >= (int32_t)nScreenWidth) x = (int32_t)nScreenWidth;
@@ -1311,8 +1311,8 @@ namespace olc
         if (y2 < 0) y2 = 0;
         if (y2 >= (int32_t)nScreenHeight) y2 = (int32_t)nScreenHeight;
 
-        for (int i = x; i < x2; i++)
-            for (int j = y; j < y2; j++)
+        for (uint32_t i = x; i < x2; i++)
+            for (uint32_t j = y; j < y2; j++)
                 Draw(i, j, p);
     }
 
@@ -1468,16 +1468,16 @@ namespace olc
 
         if (scale > 1)
         {
-            for (int32_t i = 0; i < sprite->width; i++)
-                for (int32_t j = 0; j < sprite->height; j++)
+            for (uint32_t i = 0; i < sprite->width; i++)
+                for (uint32_t j = 0; j < sprite->height; j++)
                     for (uint32_t is = 0; is < scale; is++)
                         for (uint32_t js = 0; js < scale; js++)
                             Draw(x + (i*scale) + is, y + (j*scale) + js, sprite->GetPixel(i, j));
         }
         else
         {
-            for (int32_t i = 0; i < sprite->width; i++)
-                for (int32_t j = 0; j < sprite->height; j++)
+            for (uint32_t i = 0; i < sprite->width; i++)
+                for (uint32_t j = 0; j < sprite->height; j++)
                     Draw(x + i, y + j, sprite->GetPixel(i, j));
         }
     }

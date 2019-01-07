@@ -12,7 +12,7 @@ void Minesweep::initTiles()
             if (r % 8 == 0)
                 _playField.at(i).at(j).placeMine();
             _playField.at(i).at(j).setNum(Tile::DisplayNum::Nothing);
-            int d = pow((_playField.size()/2 - i)*(_playField.size()/2 - i) + (_playField.at(0).size()/2 - j)*(_playField.at(0).size()/2 - j), .5);
+            int d = (int)ceil(pow((_playField.size()/2 - i)*(_playField.size()/2 - i) + (_playField.at(0).size()/2 - j)*(_playField.at(0).size()/2 - j), .5));
 
             for (int in = 0; in < d; ++in)
             {
@@ -95,6 +95,16 @@ Minesweep::Minesweep(size_t nTx, size_t nTy)
 
 void Minesweep::drawTiles()
 {
+    olc::Pixel backgroundColor(123, 123, 123);
+    FillRect(0,0,ScreenWidth(), ScreenHeight(), backgroundColor);
+    for (uint32_t i = 0; i < ScreenWidth(); ++i)
+    {
+        for (uint32_t j = 0; j < ScreenHeight(); ++j)
+        {
+            Draw(i, j, backgroundColor);
+        }
+    }
+
     for (auto& v : _playField)
     {
         for (auto& t : v)
@@ -116,7 +126,7 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
     }
 
     drawTiles();
-    std::cout << std::endl;
+//    std::cout << std::endl;
 
     size_t mousePointedX = (GetMouseX() - Tile::BORDER) / Tile::WIDTH;
     size_t mousePointedY = (GetMouseY() - Tile::BORDER) / Tile::HEIGHT;
@@ -246,7 +256,7 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
                 // check leftMouseButton
                 if (GetMouse(0).bReleased)
                 {
-                    std::cout << "Mouse(0).bReleased" << std::endl;
+//                    std::cout << "Mouse(0).bReleased" << std::endl;
                     if (_playField.at(mousePointedX).at(mousePointedY).isMine())
                         loose();
                     else
@@ -256,14 +266,14 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
                 // check rightMouseButton
                 if (GetMouse(1).bReleased) // not held, or pressed, stopped pressing
                 {
-                    std::cout << "Mouse(1).bReleased" << std::endl;
+//                    std::cout << "Mouse(1).bReleased" << std::endl;
                     _playField.at(mousePointedX).at(mousePointedY).toggleFlagged();
                 }
             }
         }
 
     }
-    //	std::cout << std::endl;
+//    //	std::cout << std::endl;
     return true;
 }
 

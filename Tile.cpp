@@ -15,13 +15,15 @@ Tile::Tile(unsigned int x, unsigned int y)
 
 void Tile::draw()
 {
-    if (_isKilled)
-        return;
-
 	Minesweep& ms = Minesweep::instance();
 
+    if (_isKilled)
+    {
+        ms.FillRect(_x, _y, Tile::WIDTH, Tile::HEIGHT, olc::BLACK);
+        return;
+    }
+
     // background
-	ms.FillRect(_x, _y, Tile::WIDTH, Tile::HEIGHT, olc::Pixel(123, 123, 123));
     //if (_isMine) // debugging
     //    ms.FillRect(_x, _y, Tile::WIDTH, Tile::HEIGHT, olc::Pixel(255,0,0,100));
 
@@ -71,25 +73,25 @@ void Tile::draw()
         }
     }
 
-    uint8_t alpha = _uncovered * 205 + 50;
-
     olc::Pixel numColor = olc::BLACK;
     switch (_numToDisplay)
     {
-    case Tile::DisplayNum::Nothing:numColor = olc::Pixel(  0,   0,   0,     0); break;
-    case Tile::DisplayNum::One:    numColor = olc::Pixel(  0,   0, 255, alpha); break;
-    case Tile::DisplayNum::Two:    numColor = olc::Pixel(  0, 123,   0, alpha); break;
-    case Tile::DisplayNum::Three:  numColor = olc::Pixel(255,   0,   0, alpha); break;
-    case Tile::DisplayNum::Four:   numColor = olc::Pixel(  0,   0, 123, alpha); break;
-    case Tile::DisplayNum::Five:   numColor = olc::Pixel(123,   0,   0, alpha); break;
-    case Tile::DisplayNum::Six:    numColor = olc::Pixel(  0, 123, 123, alpha); break;
-    case Tile::DisplayNum::Seven:  numColor = olc::Pixel(123,   0, 123, alpha); break;
-    case Tile::DisplayNum::Eight:  numColor = olc::Pixel(123, 123, 123, alpha); break;
+    case Tile::DisplayNum::Nothing:numColor = olc::Pixel(  0,   0,   0); break;
+    case Tile::DisplayNum::One:    numColor = olc::Pixel(  0,   0, 255); break;
+    case Tile::DisplayNum::Two:    numColor = olc::Pixel(  0, 123,   0); break;
+    case Tile::DisplayNum::Three:  numColor = olc::Pixel(255,   0,   0); break;
+    case Tile::DisplayNum::Four:   numColor = olc::Pixel(  0,   0, 123); break;
+    case Tile::DisplayNum::Five:   numColor = olc::Pixel(123,   0,   0); break;
+    case Tile::DisplayNum::Six:    numColor = olc::Pixel(  0, 123, 123); break;
+    case Tile::DisplayNum::Seven:  numColor = olc::Pixel(123,   0, 123); break;
+    case Tile::DisplayNum::Eight:  numColor = olc::Pixel(123, 123, 123); break;
     default: numColor = olc::YELLOW; break;
     }
 
     // display number of neighbors
-    if(!_isMine && _uncovered)
+    if(!_isMine
+        && _uncovered
+        && _numToDisplay != Tile::DisplayNum::Nothing)
         ms.DrawString(_x +4*SCALE, _y +4*SCALE, std::to_string(_numToDisplay), numColor, SCALE);
 
     // draw mine
