@@ -2,29 +2,34 @@
 
 void Minesweep::initTiles()
 {
-    for (unsigned int i = 0; i < _playField.size(); i++)
+    for (unsigned int i = 0; i < _nTx; i++)
     {
-        for (unsigned int j = 0; j < _playField.at(0).size(); j++)
+        std::vector<Tile> nVec;
+        for (unsigned int j = 0; j < _nTy; j++)
         {
-            _playField.at(i).at(j) = Tile(i*Tile::WIDTH + Tile::BORDER, j*Tile::HEIGHT + Tile::BORDER);
+            Tile t(i*Tile::WIDTH + Tile::BORDER, j*Tile::HEIGHT + Tile::BORDER);
+            nVec.push_back(t);
 
             int r = std::rand();
             if (r % 8 == 0)
-                _playField.at(i).at(j).placeMine();
-            _playField.at(i).at(j).setNum(Tile::DisplayNum::Nothing);
-            int d = (int)ceil(pow((_playField.size()/2 - i)*(_playField.size()/2 - i) + (_playField.at(0).size()/2 - j)*(_playField.at(0).size()/2 - j), .5));
+                nVec.at(j).placeMine();
+            nVec.at(j).setNum(Tile::DisplayNum::Nothing);
+            int d = (int)ceil(pow((_nTx/2 - i)*(_nTx/2 - i) + (_nTy/2 - j)*(_nTy/2 - j), .5));
 
             for (int in = 0; in < d; ++in)
             {
                 r = std::rand();
                 if (r % 101 == 0)
                 {
-                    _playField.at(i).at(j).kill();
+                    nVec.at(j).kill();
                     break;
                 }
             }
         }
+        _playField.push_back(nVec);
     }
+
+    initNumbers();
 }
 
 void Minesweep::initNumbers()
@@ -86,25 +91,17 @@ void Minesweep::loose()
 
 
 Minesweep::Minesweep(size_t nTx, size_t nTy)
-    : _playField(nTx, std::vector<Tile>(nTy, Tile(-1, -1)))
+  //  : _playField(nTx, std::vector<Tile>(nTy, Tile(-1, -1)))
+    : _nTx(nTx)
+    , _nTy(nTy)
 {
     sAppName = "Minesweep";
-    initTiles();
-    initNumbers();
 }
 
 void Minesweep::drawTiles()
 {
     olc::Pixel backgroundColor(123, 123, 123);
-    FillRect(0,0,ScreenWidth(), ScreenHeight(), backgroundColor);
-    for (uint32_t i = 0; i < ScreenWidth(); ++i)
-    {
-        for (uint32_t j = 0; j < ScreenHeight(); ++j)
-        {
-            Draw(i, j, backgroundColor);
-        }
-    }
-
+    Clear(backgroundColor);
     for (auto& v : _playField)
     {
         for (auto& t : v)
@@ -274,6 +271,14 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
 
     }
 //    //	std::cout << std::endl;
+    return true;
+}
+
+
+// Called once at the start, so create things here
+bool Minesweep::OnUserCreate()
+{
+    initTiles();
     return true;
 }
 

@@ -222,6 +222,8 @@
 #include <map>
 #include <functional>
 
+#include <exception>
+
 #undef min
 #undef max
 
@@ -310,6 +312,7 @@ namespace olc // All OneLoneCoder stuff will now exist in the "olc" namespace
 		Sprite(std::string sImageFile);
 		Sprite(std::string sImageFile, olc::ResourcePack *pack);
 		Sprite(int32_t w, int32_t h);
+        Sprite(Sprite const& s);
 		~Sprite();
 
 	public:
@@ -614,21 +617,47 @@ namespace olc
 
     Sprite::Sprite(int32_t w, int32_t h)
     {
-        if(pColData) delete[] pColData;
+        if (pColData)
+        {
+            delete[] pColData;
+            pColData = nullptr;
+        }
         width = w;		height = h;
         pColData = new Pixel[width * height];
         for (uint32_t i = 0; i < width*height; i++)
             pColData[i] = Pixel();
     }
 
+    Sprite::Sprite(Sprite const& s)
+    {
+        if (pColData)
+        {
+            delete[] pColData;
+            pColData = nullptr;
+        }
+        width = s.width; height = s.height;
+        pColData = new Pixel[width * height];
+        for (uint32_t i = 0; i < width*height; i++)
+            pColData[i] = s.pColData[i];
+
+    }
+
     Sprite::~Sprite()
     {
-        if (pColData) delete pColData;
+        if (pColData)
+        {
+            delete[] pColData; //jnl, inserted []
+            pColData = nullptr;
+        }
     }
 
     olc::rcode Sprite::LoadFromPGESprFile(std::string sImageFile, olc::ResourcePack *pack)
     {
-        if (pColData) delete[] pColData;
+        if (pColData)
+        {
+            delete[] pColData;
+            pColData = nullptr;
+        }
 
         auto ReadData = [&](std::istream &is)
         {
@@ -800,6 +829,11 @@ namespace olc
 
     Pixel Sprite::GetPixel(uint32_t const& x, uint32_t const& y)
     {
+        if (!pColData)
+        {
+            throw std::runtime_error("Sprite::GetPixel: no pColData");
+        }
+
         if (modeSample == olc::Sprite::Mode::NORMAL)
         {
             if (x < width && y < height)
@@ -819,7 +853,10 @@ namespace olc
 #ifdef OLC_DBG_OVERDRAW
         nOverdrawCount++;
 #endif
-
+        if (!pColData)
+        {
+            throw std::runtime_error("Sprite::SetPixel: no pColData");
+        }
         if (x < width && y < height)
             pColData[y*width + x] = p;
     }

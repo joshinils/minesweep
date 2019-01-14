@@ -20,14 +20,16 @@ class Minesweep : public olc::PixelGameEngine
     bool OnUserUpdate(float fElapsedTime) override;
 
     // Called once at the start, so create things here
-	bool OnUserCreate() override
-	{   return true;    }
+    bool OnUserCreate() override;
 
     void uncover(size_t x, size_t y);
 
-public:
+    size_t _nTx;
+    size_t _nTy;
+
     Minesweep(size_t nTx, size_t nTy);
 
+public:
     void drawTiles();
 
     static Minesweep& instance(size_t nTx = 0, size_t nTy = 0);

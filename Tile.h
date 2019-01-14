@@ -25,6 +25,7 @@ private:
 	bool _isFlagged;
 	DisplayNum _numToDisplay;
     bool _showMine;
+    olc::Sprite _lid;
     bool _isHeldDown = false;
     bool _isKilled = false;
 
@@ -37,7 +38,10 @@ public:
 
 	Tile() = delete;
 	Tile(unsigned int x, unsigned int y);
-	~Tile() = default;
+    ~Tile()
+    {
+//        std::cout << __FUNCTION__ << std::endl;
+    };
 
 	void draw();
 

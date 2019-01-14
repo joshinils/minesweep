@@ -11,7 +11,36 @@ Tile::Tile(unsigned int x, unsigned int y)
 	, _isFlagged(false)
     , _showMine(false)
     , _isHeldDown(false)
-{ }
+    , _lid(Tile::WIDTH, Tile::HEIGHT)
+{
+    olc::Pixel backgroundColor(123, 123, 123);
+    for (size_t i = 0; i < Tile::WIDTH; i++)
+    {
+        for (size_t j = 0; j < Tile::HEIGHT; j++)
+        {
+            _lid.SetPixel(i, j, backgroundColor);
+        }
+    }
+
+    olc::Pixel upper(170, 170, 170);
+    olc::Pixel lower( 82,  82,  82);
+
+    for (size_t i = 0; i < Tile::WIDTH -1; i++)
+    {
+        _lid.SetPixel(i, 0, upper);
+        if (i == Tile::WIDTH - 2)
+            break;
+        _lid.SetPixel(i, 1, upper);
+    }
+
+    for (size_t i = 0; i < Tile::HEIGHT -1; i++)
+    {
+        _lid.SetPixel(0, i, upper);
+        if (i == Tile::HEIGHT - 2)
+            break;
+        _lid.SetPixel(1, i, upper);
+    }
+}
 
 void Tile::draw()
 {
@@ -32,13 +61,14 @@ void Tile::draw()
         unsigned int w = Tile::WIDTH - 1;
         unsigned int h = Tile::HEIGHT - 1;
 
-        // top
-        ms.DrawLine(_x        , _y        , _x + w - 1, _y        , olc::Pixel(170, 170, 170));
-        ms.DrawLine(_x     + 1, _y     + 1, _x + w - 2, _y    + 1 , olc::Pixel(170, 170, 170));
+        ms.DrawSprite(_x, _y, &_lid);
+        //// top
+        //ms.DrawLine(_x        , _y        , _x + w - 1, _y        , olc::Pixel(170, 170, 170));
+        //ms.DrawLine(_x     + 1, _y     + 1, _x + w - 2, _y    + 1 , olc::Pixel(170, 170, 170));
 
-        // left
-        ms.DrawLine(_x        , _y        , _x        , _y + h - 1, olc::Pixel(170, 170, 170));
-        ms.DrawLine(_x     + 1, _y     + 1, _x     + 1, _y + h - 2, olc::Pixel(170, 170, 170));
+        //// left
+        //ms.DrawLine(_x        , _y        , _x        , _y + h - 1, olc::Pixel(170, 170, 170));
+        //ms.DrawLine(_x     + 1, _y     + 1, _x     + 1, _y + h - 2, olc::Pixel(170, 170, 170));
 
         // right
         ms.DrawLine(_x + w    , _y + 1    , _x + w    , _y + h    , olc::Pixel( 82,  82,  82));
@@ -47,6 +77,7 @@ void Tile::draw()
         // bottom
         ms.DrawLine(_x     + 1, _y + h    , _x + w    , _y + h    , olc::Pixel( 82,  82,  82));
         ms.DrawLine(_x     + 2, _y + h - 1, _x + w    , _y + h - 1, olc::Pixel( 82,  82,  82));
+
     }
 
     if(_uncovered || _isHeldDown)
