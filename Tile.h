@@ -25,7 +25,7 @@ private:
 	bool _isFlagged;
 	DisplayNum _numToDisplay;
     bool _showMine;
-    olc::Sprite _lid;
+//    static olc::Sprite _lid;
     bool _isHeldDown = false;
     bool _isKilled = false;
 
@@ -35,6 +35,7 @@ public:
     const static unsigned int WIDTH = 16 * SCALE;
     const static unsigned int HEIGHT = 16 * SCALE;
 	const static unsigned int BORDER = 4 * SCALE;
+    const static olc::Pixel BACKGROUND;
 
 	Tile() = delete;
 	Tile(unsigned int x, unsigned int y);

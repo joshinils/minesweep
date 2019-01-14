@@ -101,7 +101,7 @@ Minesweep::Minesweep(size_t nTx, size_t nTy)
 void Minesweep::drawTiles()
 {
     olc::Pixel backgroundColor(123, 123, 123);
-    Clear(backgroundColor);
+//    Clear(backgroundColor);
     for (auto& v : _playField)
     {
         for (auto& t : v)

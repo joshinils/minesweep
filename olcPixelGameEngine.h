@@ -223,6 +223,7 @@
 #include <functional>
 
 #include <exception>
+#include <algorithm>
 
 #undef min
 #undef max
@@ -429,7 +430,7 @@ namespace olc // All OneLoneCoder stuff will now exist in the "olc" namespace
 		// Draws a rectangle at (x,y) to (x+w,y+h)
 		void DrawRect(int32_t x, int32_t y, int32_t w, int32_t h, Pixel p = olc::WHITE);
 		// Fills a rectangle at (x,y) to (x+w,y+h)
-		void FillRect(int32_t x, int32_t y, int32_t w, int32_t h, Pixel p = olc::WHITE);
+		void FillRect(uint32_t const& x, uint32_t const& y, uint32_t const&w, uint32_t const& h, Pixel const& p = olc::WHITE);
 		// Draws a triangle between points (x1,y1), (x2,y2) and (x3,y3)
 		void DrawTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, Pixel p = olc::WHITE);
 		// Flat fills a triangle between points (x1,y1), (x2,y2) and (x3,y3)
@@ -847,7 +848,7 @@ namespace olc
         }
     }
 
-    void Sprite::SetPixel(uint32_t const& x, uint32_t const& y, Pixel const& p)
+    inline void Sprite::SetPixel(uint32_t const& x, uint32_t const& y, Pixel const& p)
     {
 
 #ifdef OLC_DBG_OVERDRAW
@@ -1144,7 +1145,7 @@ namespace olc
         return nScreenHeight;
     }
 
-    void PixelGameEngine::Draw(uint32_t const& x, uint32_t const& y, Pixel const& p)
+    inline void PixelGameEngine::Draw(uint32_t const& x, uint32_t const& y, Pixel const& p)
     {
         if (!pDrawTarget) return;
 
@@ -1333,23 +1334,13 @@ namespace olc
 #endif
     }
 
-    void PixelGameEngine::FillRect(int32_t x, int32_t y, int32_t w, int32_t h, Pixel p)
+    void PixelGameEngine::FillRect(uint32_t const& x, uint32_t const& y, uint32_t const&w, uint32_t const& h, Pixel const& p)
     {
-        uint32_t x2 = x + w;
-        uint32_t y2 = y + h;
+        uint32_t x2 = std::min(x + w, nScreenWidth);
+        uint32_t y2 = std::min(y + h, nScreenHeight);
 
-        if (x < 0) x = 0;
-        if (x >= (int32_t)nScreenWidth) x = (int32_t)nScreenWidth;
-        if (y < 0) y = 0;
-        if (y >= (int32_t)nScreenHeight) y = (int32_t)nScreenHeight;
-
-        if (x2 < 0) x2 = 0;
-        if (x2 >= (int32_t)nScreenWidth) x2 = (int32_t)nScreenWidth;
-        if (y2 < 0) y2 = 0;
-        if (y2 >= (int32_t)nScreenHeight) y2 = (int32_t)nScreenHeight;
-
-        for (uint32_t i = x; i < x2; i++)
-            for (uint32_t j = y; j < y2; j++)
+        for (uint32_t i = std::min(x, nScreenWidth); i < x2; ++i)
+            for (uint32_t j = std::min(y, nScreenHeight); j < y2; ++j)
                 Draw(i, j, p);
     }
 
