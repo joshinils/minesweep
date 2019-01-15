@@ -422,7 +422,7 @@ namespace olc // All OneLoneCoder stuff will now exist in the "olc" namespace
 		// Draws a single Pixel
 		virtual void Draw(uint32_t const& x, uint32_t const& y, Pixel const& p = olc::WHITE);
 		// Draws a line from (x1,y1) to (x2,y2)
-		void DrawLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Pixel p = olc::WHITE);
+		void DrawLine(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, Pixel const& p = olc::WHITE);
 		// Draws a circle located at (x,y) with radius
 		void DrawCircle(int32_t x, int32_t y, int32_t radius, Pixel p = olc::WHITE);
 		// Fills a circle located at (x,y) with radius
@@ -441,7 +441,7 @@ namespace olc // All OneLoneCoder stuff will now exist in the "olc" namespace
 		// selected area is (ox,oy) to (ox+w,oy+h)
 		void DrawPartialSprite(int32_t x, int32_t y, Sprite *sprite, int32_t ox, int32_t oy, int32_t w, int32_t h, uint32_t scale = 1);
 		// Draws a single line of text
-		void DrawString(int32_t x, int32_t y, std::string sText, Pixel col = olc::WHITE, uint32_t scale = 1);
+		void DrawString(uint32_t const& x, uint32_t const& y, std::string const& sText, Pixel const& col = olc::WHITE, uint32_t const& scale = 1);
 		// Clears entire draw target to Pixel
 		void Clear(Pixel p);
 
@@ -1188,7 +1188,7 @@ namespace olc
         fSubPixelOffsetY = oy * fPixelY;
     }
 
-    void PixelGameEngine::DrawLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Pixel p)
+    void PixelGameEngine::DrawLine(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, Pixel const& p)
     {
         int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
         dx = x2 - x1; dy = y2 - y1;
@@ -1196,17 +1196,27 @@ namespace olc
         // straight lines idea by gurkanctn
         if (dx == 0) // Line is vertical
         {
-            if (y2 < y1) std::swap(y1, y2);
-            for (y = y1; y <= y2; y++)
-                Draw(x1, y, p);
+            if (y2 < y1)
+            {
+                std::swap(y1, y2);
+            }
+            for (uint32_t _y = y1; _y <= y2; ++_y)
+            {
+                Draw(x1, _y, p);
+            }
             return;
         }
 
         if (dy == 0) // Line is horizontal
         {
-            if (x2 < x1) std::swap(x1, x2);
-            for (x = x1; x <= x2; x++)
-                Draw(x, y1, p);
+            if (x2 < x1)
+            {
+                std::swap(x1, x2);
+            }
+            for (uint32_t _x = x1; _x <= x2; ++_x)
+            {
+                Draw(_x, y1, p);
+            }
             return;
         }
 
@@ -1338,9 +1348,9 @@ namespace olc
     {
         uint32_t x2 = std::min(x + w, nScreenWidth);
         uint32_t y2 = std::min(y + h, nScreenHeight);
-
+        uint32_t y1 = std::min(y, nScreenHeight);
         for (uint32_t i = std::min(x, nScreenWidth); i < x2; ++i)
-            for (uint32_t j = std::min(y, nScreenHeight); j < y2; ++j)
+            for (uint32_t j = y1; j < y2; ++j)
                 Draw(i, j, p);
     }
 
@@ -1531,13 +1541,21 @@ namespace olc
         }
     }
 
-    void PixelGameEngine::DrawString(int32_t x, int32_t y, std::string sText, Pixel col, uint32_t scale)
+    void PixelGameEngine::DrawString(uint32_t const& x, uint32_t const& y, std::string const& sText, Pixel const& col, uint32_t const& scale)
     {
-        int32_t sx = 0;
-        int32_t sy = 0;
+        uint32_t sx = 0;
+        uint32_t sy = 0;
         Pixel::Mode m = nPixelMode;
-        if(col.ALPHA != 255)	SetPixelMode(Pixel::ALPHA);
-        else					SetPixelMode(Pixel::MASK);
+
+        if (col.ALPHA != 255)
+        {
+            SetPixelMode(Pixel::ALPHA);
+        }
+        else
+        {
+            SetPixelMode(Pixel::MASK);
+        }
+
         for (auto c : sText)
         {
             if (c == '\n')

@@ -28,6 +28,7 @@ private:
 //    static olc::Sprite _lid;
     bool _isHeldDown = false;
     bool _isKilled = false;
+    bool _needsDrawing = false;
 
 public:
 

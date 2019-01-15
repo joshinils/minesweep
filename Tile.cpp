@@ -78,7 +78,13 @@ Tile::Tile(unsigned int x, unsigned int y)
 
 void Tile::draw()
 {
-	Minesweep& ms = Minesweep::instance();
+    Minesweep& ms = Minesweep::instance();
+
+    if(!_needsDrawing)
+    {
+        return;
+    }
+    _needsDrawing = false;
 
     if (_isKilled)
     {
@@ -124,12 +130,20 @@ void Tile::draw()
     }
     else
     {
-        ms.FillRect(_x +1, _y+1, Tile::WIDTH - 1, Tile::HEIGHT - 1, Tile::BACKGROUND);
+        if (_uncovered)
+        {
+            ms.FillRect(_x + 1, _y + 1, Tile::WIDTH - 1, Tile::HEIGHT - 1, Tile::BACKGROUND);
+        }
+        else if (_isHeldDown)
+        {
+            ms.FillRect(_x + 1, _y + 1, Tile::WIDTH - 1, Tile::HEIGHT - 1, Tile::BACKGROUND);
+        }
     }
 
     if(_uncovered || _isHeldDown)
     {
         _isHeldDown = false;
+        _needsDrawing = true;
         unsigned int w = Tile::WIDTH - 1;
         unsigned int h = Tile::HEIGHT - 1;
 
@@ -167,7 +181,7 @@ void Tile::draw()
     }
 
     // display number of neighbors
-    if(!_isMine
+    if(   !_isMine
         && _uncovered
         && _numToDisplay != Tile::DisplayNum::Nothing)
         ms.DrawString(_x +4*SCALE, _y +4*SCALE, std::to_string(_numToDisplay), numColor, SCALE);
@@ -189,26 +203,37 @@ void Tile::draw()
 void Tile::uncover()
 {
     if (_isKilled)
+    {
         return;
+    }
 
-    if(_isFlagged == false)
-    	_uncovered = true;
-	draw();
+    if (_isFlagged == false)
+    {
+        _uncovered = true;
+    }
+    _needsDrawing = true;
+
+//	draw();
 }
 
 void Tile::cover()
 {
     if (_isKilled)
+    {
         return;
+    }
 
 	_uncovered = false;
-	draw();
+    _needsDrawing = true;
+//	draw();
 }
 
 bool Tile::isCovered()
 {
     if (_isKilled)
+    {
         return false;
+    }
 
     return !_uncovered;
 }
@@ -219,18 +244,23 @@ void Tile::flag()
         return;
 
 	_isFlagged = !_uncovered;
-	draw();
+    _needsDrawing = true;
+//	draw();
 }
 
 void Tile::unflag()
 {
+    _needsDrawing = true;
 	_isFlagged = false;
 }
 
 void Tile::toggleFlagged()
 {
-	if(!_uncovered)
-		_isFlagged = !_isFlagged;
+    if (!_uncovered)
+    {
+        _isFlagged = !_isFlagged;
+        _needsDrawing = true;
+    }
 }
 
 bool Tile::isFlagged()
@@ -243,7 +273,12 @@ bool Tile::isFlagged()
 
 void Tile::setNum(DisplayNum d)
 {
-	_numToDisplay = d;
+    if(_numToDisplay != d)
+    {
+        	_numToDisplay = d;
+        _needsDrawing = true;
+    }
+
 }
 
 void Tile::setNum(int i)
@@ -275,11 +310,13 @@ void Tile::placeMine()
         return;
 
     _isMine = true;
+    _needsDrawing = true;
 }
 
 void Tile::doShowMine()
 {
     _showMine = true;
+    _needsDrawing = true;
 }
 
 bool Tile::isMine()
@@ -295,6 +332,7 @@ void Tile::holdDown()
         return;
 
     _isHeldDown = true;
+    _needsDrawing = true;
 }
 
 bool Tile::isHeld()
@@ -308,4 +346,5 @@ bool Tile::isHeld()
 void Tile::kill()
 {
     _isKilled = true;
+    _needsDrawing = true;
 }
