@@ -111,15 +111,55 @@ void Minesweep::drawTiles()
     }
 }
 
+int Minesweep::aiMove()
+{
+
+    return 0;
+}
+
+olc::HWButton Minesweep::GetMouse(uint32_t b)
+{
+    olc::HWButton hw = olc::PixelGameEngine::GetMouse(b);
+
+    if  (  b == olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::middle).bHeld
+         || (   olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::left  ).bHeld
+             && olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::right ).bHeld
+            )
+        )
+    {
+        _isMiddleHeldLastFrame = true;
+        hw.bHeld = true;
+    }
+
+    return hw;
+}
+
+void Minesweep::leftClick(size_t x, size_t y)
+{
+
+}
+
+void Minesweep::rightClick(size_t x, size_t y)
+{
+}
+
+void Minesweep::middleClick(size_t x, size_t y)
+{
+}
+
 bool Minesweep::OnUserUpdate(float fElapsedTime)
 {
     if (_gameLost)
     {
         static bool drawOneLastTime = true;
         if (drawOneLastTime)
+        {
             drawOneLastTime = false;
+        }
         else
+        {
             return true;
+        }
     }
 
     drawTiles();
@@ -133,11 +173,28 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
     if (mousePointedX >= 0 && mousePointedX < _playField.size()&&
         mousePointedY >= 0 && mousePointedY < _playField.at(0).size() )
     {
-        bool doMiddle = false;
-        if ((GetMouse(0).bHeld && GetMouse(1).bHeld)
-            || GetMouse(2).bHeld // middle mouseButton
-            || (middleStillHeld && GetMouse(0).bHeld)
-            || (middleStillHeld && GetMouse(1).bHeld))
+        bool isLeftHeld = GetMouse(Minesweep::MouseButton::left).bHeld;
+        bool isRightHeld = GetMouse(Minesweep::MouseButton::right).bHeld;
+        bool isMiddleHeld = GetMouse(Minesweep::MouseButton::middle).bHeld;
+
+        if (isMiddleHeld)
+        {
+            middleClick(mousePointedX, mousePointedY);
+        }
+        else if (isLeftHeld)
+        {
+            leftClick(mousePointedX, mousePointedY);
+        }
+        else if (isRightHeld)
+        {
+            rightClick(mousePointedX, mousePointedY);
+        }
+
+        _isMiddleHeldLastFrame = false;
+        if (  (GetMouse(MouseButton::left).bHeld && GetMouse(MouseButton::right).bHeld)
+            || GetMouse(MouseButton::middle).bHeld // middle mouseButton
+            || (middleStillHeld && GetMouse(MouseButton::left).bHeld)
+            || (middleStillHeld && GetMouse(MouseButton::right).bHeld))
         {
             middleStillHeld = true;
             _heldPos.clear();
@@ -251,9 +308,9 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
             else
             {
                 // check leftMouseButton
-                if (GetMouse(0).bReleased)
+                if (GetMouse(Minesweep::MouseButton::left).bReleased)
                 {
-//                    std::cout << "Mouse(0).bReleased" << std::endl;
+                    std::cout << "Mouse(0).bReleased" << std::endl;
                     if (_playField.at(mousePointedX).at(mousePointedY).isMine())
                         loose();
                     else
@@ -261,9 +318,9 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
                 }
 
                 // check rightMouseButton
-                if (GetMouse(1).bReleased) // not held, or pressed, stopped pressing
+                if (GetMouse(Minesweep::MouseButton::right).bReleased) // not held, or pressed, stopped pressing
                 {
-//                    std::cout << "Mouse(1).bReleased" << std::endl;
+                    std::cout << "Mouse(1).bReleased" << std::endl;
                     _playField.at(mousePointedX).at(mousePointedY).toggleFlagged();
                 }
             }

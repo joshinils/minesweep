@@ -13,6 +13,7 @@ class Minesweep : public olc::PixelGameEngine
     std::vector<std::pair<unsigned int, unsigned int>> _heldPos;
 	std::vector<std::vector<Tile>> _playField;
     bool _gameLost = false;
+    bool _isMiddleHeldLastFrame = false;
 
     void initTiles();
     void initNumbers();
@@ -28,9 +29,22 @@ class Minesweep : public olc::PixelGameEngine
     size_t _nTy;
 
     Minesweep(size_t nTx, size_t nTy);
+    int aiMove();
+    olc::HWButton GetMouse(uint32_t b);
+
+    void leftClick(size_t x, size_t y);
+    void rightClick(size_t x, size_t y);
+    void middleClick(size_t x, size_t y);
 
 public:
     void drawTiles();
+
+    enum MouseButton
+    {
+        left = 0,
+        right = 1,
+        middle = 2
+    };
 
     static Minesweep& instance(size_t nTx = 0, size_t nTy = 0);
 };
