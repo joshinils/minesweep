@@ -1,6 +1,8 @@
 #ifndef TILE_H
 #define TILE_H
 
+#include "olcPixelGameEngine.h"
+
 class Tile
 {
 public:
