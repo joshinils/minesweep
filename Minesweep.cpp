@@ -90,6 +90,8 @@ void Minesweep::loose()
 }
 
 
+bool Minesweep::middleStillHeld(false);
+
 Minesweep::Minesweep(size_t nTx, size_t nTy)
   //  : _playField(nTx, std::vector<Tile>(nTy, Tile(-1, -1)))
     : _nTx(nTx)
@@ -128,7 +130,7 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
     size_t mousePointedX = (GetMouseX() - Tile::BORDER) / Tile::WIDTH;
     size_t mousePointedY = (GetMouseY() - Tile::BORDER) / Tile::HEIGHT;
 
-    static bool middleStillHeld = false;
+//    static bool middleStillHeld = false;
     // is mousepos legal?
     if (mousePointedX >= 0 && mousePointedX < _playField.size()&&
         mousePointedY >= 0 && mousePointedY < _playField.at(0).size() )
