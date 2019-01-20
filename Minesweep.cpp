@@ -21,7 +21,8 @@ void Minesweep::initTiles()
                 r = std::rand();
                 if (r % 101 == 0)
                 {
-                    nVec.at(j).kill();
+                    // currently dont kill
+                    //nVec.at(j).kill();
                     break;
                 }
             }
@@ -113,9 +114,17 @@ void Minesweep::drawTiles()
     }
 }
 
-int Minesweep::aiMove()
+int Minesweep::aiMiddleAll()
 {
-
+    for (size_t i = 0; i < _nTx; i++)
+    {
+        for (size_t j = 0; j < _nTy; j++)
+        {
+            _middleStillHeld = true;
+            middleClick(i, j);
+            Minesweep::performLogic(true);
+        }
+    }
     return 0;
 }
 
@@ -233,13 +242,33 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
         }
     }
 
-    drawTiles();
-//    std::cout << std::endl;
 
+    olc::HWButton space = olc::PixelGameEngine::GetKey(olc::Key::SPACE);
+    if (true ||space.bReleased)
+    {
+        aiMiddleAll();
+    }
+
+    drawTiles();
+    drawTiles();
+
+    return performLogic();
+}
+
+// Called once at the start, so create things here
+bool Minesweep::OnUserCreate()
+{
+    initTiles();
+    leftClick(14,10); // to get the ai started
+    return true;
+}
+
+bool Minesweep::performLogic(bool fremdaufruf /* = false */)
+{
     size_t mousePointedX = (GetMouseX() - Tile::BORDER) / Tile::WIDTH;
     size_t mousePointedY = (GetMouseY() - Tile::BORDER) / Tile::HEIGHT;
 
-//    static bool _middleStillHeld = false;
+    //    static bool _middleStillHeld = false;
     // is mousepos legal?
     if (mousePointedX >= 0 && mousePointedX < _playField.size()&&
         mousePointedY >= 0 && mousePointedY < _playField.at(0).size() )
@@ -254,8 +283,8 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
 
         if( isMidleHeld
             ||(   _middleStillHeld && isLeft_Held
-               || _middleStillHeld && isRightHeld )
-          )
+                || _middleStillHeld && isRightHeld )
+            )
         {
             _middleStillHeld = true;
             middleClick(mousePointedX, mousePointedY);
@@ -263,7 +292,7 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
 
         if(     _middleStillHeld
             && !(isRightHeld || isLeft_Held || isMidleHeld)
-            &&  (isRightRels || isLeft_Rels /* || isMidleRels, this is the bit that shall be remembered */))
+            &&  (isRightRels || isLeft_Rels /* || isMidleRels, this is the bit that shall be remembered */ || fremdaufruf))
         {
             _middleStillHeld = false;
 
@@ -303,7 +332,6 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
                 return true;
             }
 
-
             _heldPos.clear();
         }
         else if (_middleStillHeld == false)
@@ -319,15 +347,7 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
             }
         }
     }
-//    //	std::cout << std::endl;
-    return true;
-}
-
-
-// Called once at the start, so create things here
-bool Minesweep::OnUserCreate()
-{
-    initTiles();
+    //    //	std::cout << std::endl;
     return true;
 }
 

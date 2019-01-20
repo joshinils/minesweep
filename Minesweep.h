@@ -23,6 +23,8 @@ class Minesweep : public olc::PixelGameEngine
     // Called once at the start, so create things here
     bool OnUserCreate() override;
 
+    bool performLogic(bool = false);
+
     void uncover(size_t x, size_t y);
 
     size_t _nTx;
@@ -30,7 +32,7 @@ class Minesweep : public olc::PixelGameEngine
     static bool _middleStillHeld;
 
     Minesweep(size_t nTx, size_t nTy);
-    int aiMove();
+    int aiMiddleAll();
     olc::HWButton GetMouse(uint32_t b);
 
     void leftClick(size_t x, size_t y);
