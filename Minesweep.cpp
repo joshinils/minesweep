@@ -113,15 +113,124 @@ void Minesweep::drawTiles()
     }
 }
 
+int Minesweep::aiMove()
+{
+
+    return 0;
+}
+
+olc::HWButton Minesweep::GetMouse(uint32_t b)
+{
+    olc::HWButton hw = olc::PixelGameEngine::GetMouse(b);
+
+    if(    b == Minesweep::MouseButton::middle
+        && ( (    olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::left  ).bHeld
+               && olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::right ).bHeld )
+             || olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::middle ).bHeld)
+      )
+    {
+        hw.bHeld = true;
+    }
+    else if(b == Minesweep::MouseButton::middle)
+    {
+        hw.bHeld = false;
+    }
+
+    return hw;
+}
+
+void Minesweep::leftClick(size_t x, size_t y)
+{
+    if (_playField.at(x).at(y).isMine())
+        loose();
+    else
+        uncover(x, y);
+}
+
+void Minesweep::rightClick(size_t x, size_t y)
+{
+    _playField.at(x).at(y).toggleFlagged();
+}
+
+void Minesweep::middleClick(size_t x, size_t y)
+{
+    _heldPos.clear();
+
+    //middle
+    _playField.at(x).at(y).holdDown();
+    _heldPos.push_back(std::make_pair(x, y));
+
+    // and surrounding
+    // above middle
+    if (y > 0)
+    {
+        _playField.at(x).at(y - 1).holdDown();
+        _heldPos.push_back(std::make_pair(x, y - 1));
+    }
+
+    // above left
+    if (y > 0 && x > 0)
+    {
+        _playField.at(x - 1).at(y - 1).holdDown();
+        _heldPos.push_back(std::make_pair(x - 1, y - 1));
+    }
+
+    // left
+    if (x > 0)
+    {
+        _playField.at(x - 1).at(y).holdDown();
+        _heldPos.push_back(std::make_pair(x - 1, y));
+    }
+
+    // below left
+    if (_playField.at(0).size() - 1 > y && x > 0)
+    {
+        _playField.at(x - 1).at(y + 1).holdDown();
+        _heldPos.push_back(std::make_pair(x - 1, y + 1));
+    }
+
+    // below middle
+    if (_playField.at(0).size() - 1 > y)
+    {
+        _playField.at(x).at(y + 1).holdDown();
+        _heldPos.push_back(std::make_pair(x, y + 1));
+    }
+
+    // below right
+    if (_playField.at(0).size() - 1 > y &&_playField.size() - 1 > x)
+    {
+        _playField.at(x + 1).at(y + 1).holdDown();
+        _heldPos.push_back(std::make_pair(x + 1, y + 1));
+    }
+
+    // right
+    if (_playField.size() - 1 > x)
+    {
+        _playField.at(x + 1).at(y).holdDown();
+        _heldPos.push_back(std::make_pair(x + 1, y));
+    }
+
+    // above right
+    if (_playField.size() - 1 > x && y > 0)
+    {
+        _playField.at(x + 1).at(y - 1).holdDown();
+        _heldPos.push_back(std::make_pair(x + 1, y - 1));
+    }
+}
+
 bool Minesweep::OnUserUpdate(float fElapsedTime)
 {
     if (_gameLost)
     {
         static bool drawOneLastTime = true;
         if (drawOneLastTime)
+        {
             drawOneLastTime = false;
+        }
         else
+        {
             return true;
+        }
     }
 
     drawTiles();
@@ -135,142 +244,80 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
     if (mousePointedX >= 0 && mousePointedX < _playField.size()&&
         mousePointedY >= 0 && mousePointedY < _playField.at(0).size() )
     {
-        bool doMiddle = false;
-        if ((GetMouse(0).bHeld && GetMouse(1).bHeld)
-            || GetMouse(2).bHeld // middle mouseButton
-            || (_middleStillHeld && GetMouse(0).bHeld)
-            || (_middleStillHeld && GetMouse(1).bHeld))
+        bool isLeft_Held = GetMouse(Minesweep::MouseButton::left).bHeld;
+        bool isRightHeld = GetMouse(Minesweep::MouseButton::right).bHeld;
+        bool isMidleHeld = GetMouse(Minesweep::MouseButton::midle).bHeld;
+
+        bool isLeft_Rels = GetMouse(Minesweep::MouseButton::left).bReleased;
+        bool isRightRels = GetMouse(Minesweep::MouseButton::right).bReleased;
+        bool isMidleRels = GetMouse(Minesweep::MouseButton::midle).bReleased;
+
+        if( isMidleHeld
+            ||(   _middleStillHeld && isLeft_Held
+               || _middleStillHeld && isRightHeld )
+          )
         {
             _middleStillHeld = true;
-            _heldPos.clear();
-
-            //middle
-            _playField.at(mousePointedX).at(mousePointedY).holdDown();
-            _heldPos.push_back(std::make_pair(mousePointedX, mousePointedY));
-
-            // and surrounding
-            // above middle
-            if (mousePointedY > 0)
-            {
-                _playField.at(mousePointedX).at(mousePointedY - 1).holdDown();
-                _heldPos.push_back(std::make_pair(mousePointedX, mousePointedY - 1));
-            }
-
-            // above left
-            if (mousePointedY > 0 && mousePointedX > 0)
-            {
-                _playField.at(mousePointedX - 1).at(mousePointedY - 1).holdDown();
-                _heldPos.push_back(std::make_pair(mousePointedX - 1, mousePointedY - 1));
-            }
-
-            // left
-            if (mousePointedX > 0)
-            {
-                _playField.at(mousePointedX - 1).at(mousePointedY).holdDown();
-                _heldPos.push_back(std::make_pair(mousePointedX - 1, mousePointedY));
-            }
-
-            // below left
-            if (_playField.at(0).size() - 1 > mousePointedY && mousePointedX > 0)
-            {
-                _playField.at(mousePointedX - 1).at(mousePointedY + 1).holdDown();
-                _heldPos.push_back(std::make_pair(mousePointedX - 1, mousePointedY + 1));
-            }
-
-            // below middle
-            if (_playField.at(0).size() - 1 > mousePointedY)
-            {
-                _playField.at(mousePointedX).at(mousePointedY + 1).holdDown();
-                _heldPos.push_back(std::make_pair(mousePointedX, mousePointedY + 1));
-            }
-
-            // below right
-            if (_playField.at(0).size() - 1 > mousePointedY &&_playField.size() - 1 > mousePointedX)
-            {
-                _playField.at(mousePointedX + 1).at(mousePointedY + 1).holdDown();
-                _heldPos.push_back(std::make_pair(mousePointedX + 1, mousePointedY + 1));
-            }
-
-            // right
-            if (_playField.size() - 1 > mousePointedX)
-            {
-                _playField.at(mousePointedX + 1).at(mousePointedY).holdDown();
-                _heldPos.push_back(std::make_pair(mousePointedX + 1, mousePointedY));
-            }
-
-            // above right
-            if (_playField.size() - 1 > mousePointedX && mousePointedY > 0)
-            {
-                _playField.at(mousePointedX + 1).at(mousePointedY - 1).holdDown();
-                _heldPos.push_back(std::make_pair(mousePointedX + 1, mousePointedY - 1));
-            }
+            middleClick(mousePointedX, mousePointedY);
         }
-        else
+
+        if(     _middleStillHeld
+            && !(isRightHeld || isLeft_Held || isMidleHeld)
+            &&  (isRightRels || isLeft_Rels /* || isMidleRels, this is the bit that shall be remembered */))
         {
-            if (_middleStillHeld)
+            _middleStillHeld = false;
+
+            if (_heldPos.size() > 0 && !_playField.at(_heldPos.at(0).first).at(_heldPos.at(0).second).isCovered())
             {
-                _middleStillHeld = false;
-
-                if (_heldPos.size() > 0 && !_playField.at(_heldPos.at(0).first).at(_heldPos.at(0).second).isCovered())
+                bool dontContinue = false;
+                int minesLeft = 0;
+                for (unsigned int i = 0; i < _heldPos.size(); i++)
                 {
-                    bool dontContinue = false;
-                    int minesLeft = 0;
-                    for (unsigned int i = 0; i < _heldPos.size(); i++)
-                    {
-                        Tile& t = _playField.at(_heldPos.at(i).first).at(_heldPos.at(i).second);
+                    Tile& t = _playField.at(_heldPos.at(i).first).at(_heldPos.at(i).second);
 
-                        // is it wrongly flagged?
-                        if (t.isFlagged() && !t.isMine())
-                            loose();
-
-                        if (t.isMine() && !t.isFlagged())
-                        {
-                            dontContinue = true;
-                        }
-
-                        if (t.isMine())
-                            ++minesLeft;
-                    }
-
-                    for (unsigned int i = 0; i < _heldPos.size(); i++)
-                    {
-                        if (dontContinue)
-                            break;
-
-                        Tile& t = _playField.at(_heldPos.at(i).first).at(_heldPos.at(i).second);
-
-                        if (t.isFlagged())
-                            continue;
-
-                        uncover(_heldPos.at(i).first, _heldPos.at(i).second);
-                    }
-                    return true;
-                }
-
-
-                _heldPos.clear();
-            }
-            else
-            {
-                // check leftMouseButton
-                if (GetMouse(0).bReleased)
-                {
-//                    std::cout << "Mouse(0).bReleased" << std::endl;
-                    if (_playField.at(mousePointedX).at(mousePointedY).isMine())
+                    // is it wrongly flagged?
+                    if (t.isFlagged() && !t.isMine())
                         loose();
-                    else
-                        uncover(mousePointedX, mousePointedY);
+
+                    if (t.isMine() && !t.isFlagged())
+                    {
+                        dontContinue = true;
+                    }
+
+                    if (t.isMine())
+                        ++minesLeft;
                 }
 
-                // check rightMouseButton
-                if (GetMouse(1).bReleased) // not held, or pressed, stopped pressing
+                for (unsigned int i = 0; i < _heldPos.size(); i++)
                 {
-//                    std::cout << "Mouse(1).bReleased" << std::endl;
-                    _playField.at(mousePointedX).at(mousePointedY).toggleFlagged();
+                    if (dontContinue)
+                        break;
+
+                    Tile& t = _playField.at(_heldPos.at(i).first).at(_heldPos.at(i).second);
+
+                    if (t.isFlagged())
+                        continue;
+
+                    uncover(_heldPos.at(i).first, _heldPos.at(i).second);
                 }
+                return true;
+            }
+
+
+            _heldPos.clear();
+        }
+        else if (_middleStillHeld == false)
+        {
+            // left is released, right is not released and not held
+            if (isLeft_Rels && !isRightRels && !isRightHeld)
+            {
+                leftClick(mousePointedX, mousePointedY);
+            }
+            else if (!isLeft_Rels && isRightRels && !isLeft_Held)
+            {
+                rightClick(mousePointedX, mousePointedY);
             }
         }
-
     }
 //    //	std::cout << std::endl;
     return true;
