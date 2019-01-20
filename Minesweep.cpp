@@ -121,14 +121,15 @@ olc::HWButton Minesweep::GetMouse(uint32_t b)
 {
     olc::HWButton hw = olc::PixelGameEngine::GetMouse(b);
 
-    if  (  b == olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::middle).bHeld
-         || (   olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::left  ).bHeld
-             && olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::right ).bHeld
-            )
-        )
+    if(    olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::left  ).bHeld
+        && olc::PixelGameEngine::GetMouse(Minesweep::MouseButton::right ).bHeld
+      )
     {
-        _isMiddleHeldLastFrame = true;
         hw.bHeld = true;
+    }
+    else
+    {
+        hw.bHeld = false;
     }
 
     return hw;
