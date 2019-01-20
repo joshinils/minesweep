@@ -169,7 +169,7 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
     size_t mousePointedX = (GetMouseX() - Tile::BORDER) / Tile::WIDTH;
     size_t mousePointedY = (GetMouseY() - Tile::BORDER) / Tile::HEIGHT;
 
-    static bool middleStillHeld = false;
+    static bool _middleStillHeld = false;
     // is mousepos legal?
     if (mousePointedX >= 0 && mousePointedX < _playField.size()&&
         mousePointedY >= 0 && mousePointedY < _playField.at(0).size() )
@@ -194,10 +194,10 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
         _isMiddleHeldLastFrame = false;
         if (  (GetMouse(MouseButton::left).bHeld && GetMouse(MouseButton::right).bHeld)
             || GetMouse(MouseButton::middle).bHeld // middle mouseButton
-            || (middleStillHeld && GetMouse(MouseButton::left).bHeld)
-            || (middleStillHeld && GetMouse(MouseButton::right).bHeld))
+            || (_middleStillHeld && GetMouse(MouseButton::left).bHeld)
+            || (_middleStillHeld && GetMouse(MouseButton::right).bHeld))
         {
-            middleStillHeld = true;
+            _middleStillHeld = true;
             _heldPos.clear();
 
             //middle
@@ -263,9 +263,9 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
         }
         else
         {
-            if (middleStillHeld)
+            if (_middleStillHeld)
             {
-                middleStillHeld = false;
+                _middleStillHeld = false;
 
                 if (_heldPos.size() > 0 && !_playField.at(_heldPos.at(0).first).at(_heldPos.at(0).second).isCovered())
                 {
