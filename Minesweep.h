@@ -26,7 +26,7 @@ class Minesweep : public olc::PixelGameEngine
 
     size_t _nTx;
     size_t _nTy;
-    static bool middleStillHeld;
+    static bool _middleStillHeld;
 
     Minesweep(size_t nTx, size_t nTy);
 
