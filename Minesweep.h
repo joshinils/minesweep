@@ -33,6 +33,7 @@ class Minesweep : public olc::PixelGameEngine
 
     Minesweep(size_t nTx, size_t nTy);
     int aiMiddleAll();
+    int aiRightAll(bool = false);
     olc::HWButton GetMouse(uint32_t b);
 
     void leftClick(size_t x, size_t y);

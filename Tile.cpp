@@ -92,10 +92,6 @@ void Tile::draw()
         return;
     }
 
-    // background
-    //if (_isMine) // debugging
-    //    ms.FillRect(_x, _y, Tile::WIDTH, Tile::HEIGHT, olc::Pixel(255,0,0,100));
-
     if (!_uncovered && !_isHeldDown)
     {
         unsigned int w = Tile::WIDTH - 1;
@@ -188,16 +184,28 @@ void Tile::draw()
 
     // draw mine
     if(_showMine && _isMine)
+    {
+        unsigned int r = (Tile::WIDTH + Tile::HEIGHT) / 8;
+        unsigned int y1 = 200;
+        for (size_t i = 0; i < r; i++)
         {
-            unsigned int r = (Tile::WIDTH + Tile::HEIGHT) / 8;
-            unsigned int y1 = 200;
-            for (size_t i = 0; i < r; i++)
-            {
-                uint8_t c = uint8_t(255 -((255 - y1)*i / r + y1));
-                ms.FillCircle(_x + Tile::WIDTH / 2, _y + Tile::HEIGHT / 2, int32_t(r -i) , olc::Pixel(c, c, c, 200));
-            }
+            uint8_t c = uint8_t(255 -((255 - y1)*i / r + y1));
+            ms.FillCircle(_x + Tile::WIDTH / 2, _y + Tile::HEIGHT / 2, int32_t(r -i) , olc::Pixel(c, c, c, 200));
         }
+    }
 
+
+    ms.SetPixelMode(olc::Pixel::Mode::ALPHA);
+    // debugging
+    if (!_uncovered)
+    {
+        ms.FillRect(_x, _y, Tile::WIDTH, Tile::HEIGHT, olc::Pixel(0, 0, 0, 40));
+    }
+    if (_isMine)
+    {
+        ms.FillRect(_x, _y, Tile::WIDTH, Tile::HEIGHT, olc::Pixel(255, 0, 0, 40));
+    }
+    ms.SetPixelMode(olc::Pixel::Mode::NORMAL);
 }
 
 void Tile::uncover()
@@ -243,7 +251,10 @@ void Tile::flag()
     if (_isKilled)
         return;
 
-	_isFlagged = !_uncovered;
+    if (_uncovered)
+        return;
+
+	_isFlagged = true;
     _needsDrawing = true;
 //	draw();
 }

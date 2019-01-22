@@ -29,7 +29,8 @@ void Minesweep::initTiles()
         }
         _playField.push_back(nVec);
     }
-
+    _playField.at(2).at(2).placeMine();
+    _playField.at(0).at(0).placeMine();
     initNumbers();
 }
 
@@ -125,6 +126,161 @@ int Minesweep::aiMiddleAll()
             Minesweep::performLogic(true);
         }
     }
+    return 0;
+}
+
+int Minesweep::aiRightAll(bool doStuff /* = false */)
+{
+    std::vector<std::vector<int>> coveredNeighbors(_nTx, std::vector<int>(_nTy, 0));
+    for (unsigned int spalte = 0; spalte < _playField.size(); ++spalte)
+    {
+        for (unsigned int zeile = 0; zeile < _playField.at(0).size(); ++zeile)
+        {
+            // above middle
+            if (zeile > 0)
+                coveredNeighbors[spalte][zeile] += (int)_playField.at(spalte).at(zeile - 1).isCovered();
+
+            // above left
+            if (zeile > 0 && spalte > 0)
+                coveredNeighbors[spalte][zeile] += (int)_playField.at(spalte - 1).at(zeile - 1).isCovered();
+
+            // left
+            if (spalte > 0)
+                coveredNeighbors[spalte][zeile] += (int)_playField.at(spalte - 1).at(zeile).isCovered();
+
+            // below left
+            if (_playField.at(0).size() - 1 > zeile && spalte > 0)
+                coveredNeighbors[spalte][zeile] += (int)_playField.at(spalte - 1).at(zeile + 1).isCovered();
+
+            // below middle
+            if (_playField.at(0).size() - 1 > zeile)
+                coveredNeighbors[spalte][zeile] += (int)_playField.at(spalte).at(zeile + 1).isCovered();
+
+            // below right
+            if (_playField.at(0).size() - 1 > zeile &&_playField.size() - 1 > spalte)
+                coveredNeighbors[spalte][zeile] += (int)_playField.at(spalte + 1).at(zeile + 1).isCovered();
+
+            // right
+            if (_playField.size() - 1 > spalte)
+                coveredNeighbors[spalte][zeile] += (int)_playField.at(spalte + 1).at(zeile).isCovered();
+
+            // above right
+            if (_playField.size() - 1 > spalte && zeile > 0)
+                coveredNeighbors[spalte][zeile] += (int)_playField.at(spalte + 1).at(zeile - 1).isCovered();
+
+            SetPixelMode(olc::Pixel::Mode::ALPHA);
+            if (coveredNeighbors[spalte][zeile] > 0)
+            {
+                DrawString(spalte*Tile::WIDTH + Tile::BORDER, zeile*Tile::HEIGHT + Tile::BORDER, std::to_string(coveredNeighbors[spalte][zeile]), olc::Pixel(255, 200, 255, 100));
+            //    DrawString(spalte*Tile::WIDTH + Tile::BORDER + 10, zeile*Tile::HEIGHT + Tile::BORDER, std::to_string(_playField.at(spalte).at(zeile).getNum()), olc::Pixel(200, 255, 255, 100));
+
+                if (!_playField.at(spalte).at(zeile).isCovered())
+                {
+//                    std::cout << coveredNeighbors[spalte][zeile] << " " << (coveredNeighbors[spalte][zeile] == _playField.at(spalte).at(zeile).getNum()) << " " << _playField.at(spalte).at(zeile).getNum() << std::endl;
+                    if (coveredNeighbors[spalte][zeile] == _playField.at(spalte).at(zeile).getNum())
+                        DrawString(spalte*Tile::WIDTH + Tile::BORDER, zeile*Tile::HEIGHT + Tile::BORDER + 10, "f", olc::Pixel(0, 0, 0, 100));
+                }
+            }
+        }
+    }
+
+    if (!doStuff)
+    {
+        return 0;
+    }
+
+    std::vector<std::vector<int>> flaggedNeighbors(_nTy, std::vector<int>(_nTx, 0));
+    for (unsigned int zeile = 0; zeile < _playField.size(); ++zeile)
+    {
+        for (unsigned int spalte = 0; spalte < _playField.at(0).size(); ++spalte)
+        {
+            // above middle
+            if (spalte > 0)
+                coveredNeighbors[zeile][spalte] += _playField.at(zeile).at(spalte - 1).isFlagged();
+
+            // above left
+            if (spalte > 0 && zeile > 0)
+                coveredNeighbors[zeile][spalte] += _playField.at(zeile - 1).at(spalte - 1).isFlagged();
+
+            // left
+            if (zeile > 0)
+                coveredNeighbors[zeile][spalte] += _playField.at(zeile - 1).at(spalte).isFlagged();
+
+            // below left
+            if (_playField.at(0).size() - 1 > spalte && zeile > 0)
+                coveredNeighbors[zeile][spalte] += _playField.at(zeile - 1).at(spalte + 1).isFlagged();
+
+            // below middle
+            if (_playField.at(0).size() - 1 > spalte)
+                coveredNeighbors[zeile][spalte] += _playField.at(zeile).at(spalte + 1).isFlagged();
+
+            // below right
+            if (_playField.at(0).size() - 1 > spalte &&_playField.size() - 1 > zeile)
+                coveredNeighbors[zeile][spalte] += _playField.at(zeile + 1).at(spalte + 1).isFlagged();
+
+            // right
+            if (_playField.size() - 1 > zeile)
+                coveredNeighbors[zeile][spalte] += _playField.at(zeile + 1).at(spalte).isFlagged();
+
+            // above right
+            if (_playField.size() - 1 > zeile && spalte > 0)
+                coveredNeighbors[zeile][spalte] += _playField.at(zeile + 1).at(spalte - 1).isFlagged();
+        }
+    }
+
+    for (unsigned int zeile = 0; zeile < _playField.size(); ++zeile)
+    {
+        for (unsigned int spalte = 0; spalte < _playField.at(0).size(); ++spalte)
+        {
+            if (coveredNeighbors[zeile][spalte] == 0)
+                continue;
+
+            if (_playField.at(zeile).at(spalte).isCovered())
+                continue;
+
+            if (coveredNeighbors[zeile][spalte] == _playField.at(zeile).at(spalte).getNum())
+            {
+                // flag all neighbors
+
+                //// above middle
+                //if (spalte > 0)
+                //    _playField.at(zeile).at(spalte - 1).flag();
+
+                // above left
+                if (spalte > 0 && zeile > 0)
+                    _playField.at(zeile - 1).at(spalte - 1).flag();
+
+                //// left
+                //if (zeile > 0)
+                //    _playField.at(zeile - 1).at(spalte).flag();
+
+                //// below left
+                //if (_playField.at(0).size() - 1 > spalte && zeile > 0)
+                //    _playField.at(zeile - 1).at(spalte + 1).flag();
+
+                //// below middle
+                //if (_playField.at(0).size() - 1 > spalte)
+                //    _playField.at(zeile).at(spalte + 1).flag();
+
+                //// below right
+                //if (_playField.at(0).size() - 1 > spalte &&_playField.size() - 1 > zeile)
+                //    _playField.at(zeile + 1).at(spalte + 1).flag();
+
+                //// right
+                //if (_playField.size() - 1 > zeile)
+                //    _playField.at(zeile + 1).at(spalte).flag();
+
+                //// above right
+                //if (_playField.size() - 1 > zeile && spalte > 0)
+                //    _playField.at(zeile + 1).at(spalte - 1).flag();
+            }
+        }
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+
     return 0;
 }
 
@@ -242,15 +398,21 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
         }
     }
 
+    drawTiles();
+
 
     olc::HWButton space = olc::PixelGameEngine::GetKey(olc::Key::SPACE);
-    if (true ||space.bReleased)
+    if (true || space.bHeld)
     {
-        aiMiddleAll();
+        aiRightAll(true);
+        double a = 0;
     }
+    else
+    {
+        aiRightAll(false);
+    }
+    aiMiddleAll();
 
-    drawTiles();
-    drawTiles();
 
     return performLogic();
 }
@@ -259,8 +421,26 @@ bool Minesweep::OnUserUpdate(float fElapsedTime)
 bool Minesweep::OnUserCreate()
 {
     initTiles();
-    leftClick(14,10); // to get the ai started
-    return true;
+
+    // to get the ai started
+    bool broken = false;
+    for (size_t zeile = 0; zeile < _nTy; zeile++)
+    {
+        for (size_t spalte = 0; spalte < _nTx; spalte++)
+        {
+            if (   _playField.at(zeile).at(spalte).getNum() == 0
+                && !_playField.at(zeile).at(spalte).isMine() )
+            {
+                leftClick(zeile, spalte);
+                broken = true;
+                break;
+            }
+        }
+        if (broken)
+            break;
+    }
+
+    return broken;
 }
 
 bool Minesweep::performLogic(bool fremdaufruf /* = false */)
